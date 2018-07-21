@@ -1,15 +1,19 @@
 package com.example.minga.bakingapp.models;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
 /**
  * Created by minga on 7/11/2018.
  */
-
+@Entity(tableName = "recipes")
 public class Recipe implements Parcelable {
+    @PrimaryKey @NonNull
     Integer id;
     String name;
     Integer servings;

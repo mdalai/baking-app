@@ -3,6 +3,7 @@
     package="com.example.minga.bakingapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.example.minga.bakingapp.READ_WRITE"></uses-permission>
 
     <application
         android:allowBackup="true"
@@ -18,8 +19,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RecipeDetailActivity"
-            android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".RecipeDetailActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".StepDetailActivity"
+            android:parentActivityName=".RecipeDetailActivity" />
+
+        <receiver android:name=".BakingAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/baking_app_widget_info" />
+        </receiver>
+
+        <provider
+            android:name=".provider.MyContentProvider"
+            android:authorities="com.example.minga.bakingapp"
+            android:exported="true" />
+
+        <service android:name=".services.BakingAppService" />
+
     </application>
 
 </manifest>

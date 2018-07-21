@@ -55,7 +55,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
         holder.recipeStepsTv.setText (String.valueOf (recipe.getSteps ().size ()) + " Steps");
         holder.recipeServingsTv.setText (String.valueOf (recipe.getServings ()) + " Servings");
 
-
         // set click listener
         holder.itemView.setOnClickListener (new View.OnClickListener () {
             @Override
@@ -84,14 +83,6 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
         public ViewHolder(View itemView) {
             super (itemView);
             ButterKnife.bind(this, itemView);
-            /*
-            cv = (CardView)itemView.findViewById (R.id.recipe_card_item_cv);
-            recipeNameTv = (TextView)itemView.findViewById (R.id.recipe_item_name_tv);
-            recipeIngredientsTv =(TextView)itemView.findViewById (R.id.recipe_item_ingredients_tv);
-            recipeStepsTv =(TextView)itemView.findViewById (R.id.recipe_item_steps_tv);
-            recipeServingsTv =(TextView)itemView.findViewById (R.id.recipe_item_servings_tv);
-            recipeIconIv = (ImageView)itemView.findViewById (R.id.recipe_item_icon_iv);
-            */
         }
     }
 

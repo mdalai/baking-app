@@ -3,7 +3,7 @@
 <com.google.android.exoplayer2.ui.SimpleExoPlayerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/playerView"
-    android:layout_width="250dp"
-    android:layout_height="250dp"
+    android:layout_width="wrap_content"
+    android:layout_height="300dp"
     />
 

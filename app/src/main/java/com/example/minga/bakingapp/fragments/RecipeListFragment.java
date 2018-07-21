@@ -1,22 +1,29 @@
 package com.example.minga.bakingapp.fragments;
 
 import android.app.Fragment;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.minga.bakingapp.AppExecutors;
 import com.example.minga.bakingapp.R;
 import com.example.minga.bakingapp.RecipeDetailActivity;
+import com.example.minga.bakingapp.database.AppDatabase;
 import com.example.minga.bakingapp.interfaces.ItemClickListener;
 import com.example.minga.bakingapp.adapters.RecipesAdapter;
 import com.example.minga.bakingapp.models.Recipe;
@@ -28,14 +35,18 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by minga on 7/12/2018.
  */
 
 public class RecipeListFragment extends Fragment {
+    private static final String LOG_TAG = RecipeListFragment.class.getSimpleName ();
     ArrayList<Recipe> recipes;
     RecipesAdapter recipesAdapter;
+
+    private AppDatabase mDb;
 
     // constructor
     public RecipeListFragment(){ }
@@ -46,9 +57,20 @@ public class RecipeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View view = inflater.inflate (R.layout.recipes_list, parent, false);
 
-        // load and parse Json with AsyncTask
-        URL apiURL = NetworkUtils.buildApiUrl ();
-        new LoadJsonAsyncTask().execute(apiURL);
+        // initialize DB
+        mDb = AppDatabase.getInstance ((getContext ()));
+        final Recipe recipeDbCheck = mDb.recipeDao ().getAnyRecipe();
+        if(recipeDbCheck == null){
+            Log.d (LOG_TAG, "Getting JSON and storing into Database.");
+            // load and parse Json with AsyncTask
+            URL apiURL = NetworkUtils.buildApiUrl ();
+            new LoadJsonAsyncTask().execute(apiURL);
+            recipes = new ArrayList<Recipe> ();
+
+        } else {
+            Log.d (LOG_TAG, "Loading database!");
+            recipes = (ArrayList<Recipe> ) mDb.recipeDao ().getAllRecipes ();
+        }
 
         // create interface instance
         ItemClickListener listener = new ItemClickListener() {
@@ -72,7 +94,7 @@ public class RecipeListFragment extends Fragment {
         final LinearLayoutManager layoutManager = new LinearLayoutManager (getActivity ());
         layoutManager.setOrientation (LinearLayoutManager.VERTICAL);
         rvRecipes.setLayoutManager (layoutManager);
-        recipes = new ArrayList<Recipe> ();
+        //recipes = new ArrayList<Recipe> ();
         recipesAdapter = new RecipesAdapter (getContext (), recipes, listener);
         rvRecipes.setAdapter (recipesAdapter);
         rvRecipes.setItemAnimator(new DefaultItemAnimator ());
@@ -101,7 +123,11 @@ public class RecipeListFragment extends Fragment {
             try {
                 json = NetworkUtils.getResponseFromHttpUrl (url);
                 recipes = JsonUtils.parseJsonToArrayList (json);
-                //Log.d ("PRINT---", String.valueOf (recipes));
+                // insert into DB
+                for(final Recipe recipe : recipes){
+                    mDb.recipeDao ().insertRecipe (recipe);
+                }
+
             } catch (IOException e){
                 e.printStackTrace ();
             } catch (JSONException e){

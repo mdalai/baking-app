@@ -45,10 +45,12 @@ public class VideoFragment extends Fragment {
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
 
+    static final String BUNDLE_VIDEO_URL = "VIDEO_URL";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState)  {
         if (this.getArguments() != null) {
-            videoURL = this.getArguments ().getString ("VIDEO_URL");
+            videoURL = this.getArguments ().getString (BUNDLE_VIDEO_URL);
         }
 
         View view = inflater.inflate (R.layout.video_fragment, parent, false);
@@ -56,8 +58,6 @@ public class VideoFragment extends Fragment {
         mPlayerView = (SimpleExoPlayerView ) view.findViewById (R.id.playerView);
         Uri videoUri = Uri.parse (videoURL);
         initializePlayer(videoUri);
-
-
         return view;
     }
 
@@ -77,7 +77,7 @@ public class VideoFragment extends Fragment {
             String userAgent = Util.getUserAgent (getActivity (), "RecipeStepVideo");
             MediaSource mediaSource = new ExtractorMediaSource (mediaUri, new DefaultDataSourceFactory (getActivity (), userAgent), new DefaultExtractorsFactory (), null,null);
             mExoPlayer.prepare (mediaSource);
-            //mExoPlayer.setPlayWhenReady (true);
+            mExoPlayer.setPlayWhenReady (true);
         }
     }
 
