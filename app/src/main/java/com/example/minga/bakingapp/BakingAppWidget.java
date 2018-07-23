@@ -5,24 +5,63 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.example.minga.bakingapp.services.BakingAppService;
+import com.example.minga.bakingapp.services.ListviewWidgetService;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class BakingAppWidget extends AppWidgetProvider {
 
-    private static final int LOADER_RECIPE = 2;
+    @Override
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        //Start the intent service update widget action, the service takes care of updating the widgets UI
+        BakingAppService.startActionQueryDataWidgets(context);
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, String dbTitle, String dbIngredientsStr) {
+        for (int appWidgetId : appWidgetIds) {
+            RemoteViews remoteViews = updateWidgetListView(context, appWidgetId);
+            appWidgetManager.updateAppWidget(appWidgetId,  remoteViews);
+        }
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
+    }
 
+
+    private RemoteViews updateWidgetListView(Context context,int appWidgetId) {
+        //which layout to show on widget
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(),R.layout.baking_app_widget);
+
+        //RemoteViews Service needed to provide adapter for ListView
+        Intent svcIntent = new Intent(context, ListviewWidgetService.class);
+        //passing app widget id to that RemoteViews Service
+        svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        //setting a unique Uri to the intent
+        svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        //setting adapter to listview of the widget
+        remoteViews.setRemoteAdapter(appWidgetId, R.id.appwidget_ingredients_lv,  svcIntent);
+        //setting an empty view in case of no data
+        //remoteViews.setEmptyView(R.id.appwidget_ingredients_lv, R.id.empty_view);
+        return remoteViews;
+    }
+
+    @Override
+    public void onEnabled(Context context) {
+        // Enter relevant functionality for when the first widget is created
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        // Enter relevant functionality for when the last widget is disabled
+    }
+
+
+    static void updateAppWidget2(Context context, AppWidgetManager appWidgetManager, int appWidgetId, String dbTitle) {
         //CharSequence widgetText = context.getString (R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews (context.getPackageName (), R.layout.baking_app_widget);
         views.setTextViewText (R.id.appwidget_title_tv, dbTitle);
-        views.setTextViewText (R.id.appwidget_ingredients_tv, dbIngredientsStr);
 
         // add click Handler to only launch the app using pending intent
         Intent intent=new Intent(context, MainActivity.class);
@@ -39,32 +78,11 @@ public class BakingAppWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget (appWidgetId, views);
     }
 
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
-        //for (int appWidgetId : appWidgetIds) {
-        //    updateAppWidget (context, appWidgetManager, appWidgetId);
-        //}
 
-        //Start the intent service update widget action, the service takes care of updating the widgets UI
-        BakingAppService.startActionQueryDataWidgets(context);
-    }
-
-
-    public static void updateBakingAppWidgets(Context context, AppWidgetManager appWidgetManager,int[] appWidgetIds, String dbTitle, String dbIngredientsStr) {
+    public static void updateBakingAppWidgets(Context context, AppWidgetManager appWidgetManager,int[] appWidgetIds, String dbTitle) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId, dbTitle, dbIngredientsStr );
+            updateAppWidget2(context, appWidgetManager, appWidgetId, dbTitle);
         }
-    }
-
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
     }
 
 }

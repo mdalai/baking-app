@@ -35,6 +35,7 @@
             android:src="@drawable/ic_android_black_24dp" />
     </LinearLayout>
 
+    <!--
     <TextView
         android:id="@+id/appwidget_ingredients_tv"
         android:layout_width="wrap_content"
@@ -45,14 +46,12 @@
         android:background="#09C"
         android:textColor="#ffffff"
         android:textSize="10sp" />
+    -->
 
-    <!--
-    <ListView android:id="@+id/appwidget_list_lv"
+    <ListView android:id="@+id/appwidget_ingredients_lv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        /> -->
+
+        />
 
 </LinearLayout>

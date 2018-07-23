@@ -49,35 +49,17 @@ public class BakingAppService extends IntentService {
     private void handleActionQueryDataWidgets(){
         Uri RECIPE_URI = URI_RECIPES;
         Cursor cursor = getContentResolver ().query (RECIPE_URI,null,null,null,"id");
-
         String recipeName = "";
-        String ingredients = "";
-        ArrayList<Ingredient> ingredientsArr = new ArrayList<Ingredient> ();
-        String ingredientsStr = "";
-
         if (cursor!=null && cursor.getCount () >0){
             cursor.moveToFirst ();
             int recipeNameIdx = cursor.getColumnIndex ("name");
-            int ingredientsIdx = cursor.getColumnIndex ("ingredients");
             recipeName = cursor.getString (recipeNameIdx);
-            ingredients = cursor.getString (ingredientsIdx);
-
-            Type listType = new TypeToken<ArrayList<Ingredient>> () {}.getType();
-            ingredientsArr = new Gson ().fromJson(ingredients, listType);
-            for(int i=0; i < ingredientsArr.size (); i++ ){
-                ingredientsStr = ingredientsStr +
-                        ingredientsArr.get (i).getIngredient () + " (" +
-                        ingredientsArr.get (i).getQuantity ()+" " +
-                        ingredientsArr.get (i).getMeasure () + ") \n ";
-            }
-
-            //Log.d ("PRINT-DB CURSOR2:", ingredientsStr);
             cursor.close ();
         }
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance (this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds (new ComponentName (this, BakingAppWidget.class));
-        BakingAppWidget.updateBakingAppWidgets (this, appWidgetManager, appWidgetIds, recipeName, ingredientsStr);
+        BakingAppWidget.updateBakingAppWidgets (this, appWidgetManager, appWidgetIds, recipeName);
 
     }
 }
